@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CircleBufferGeometry, MeshStandardMaterial, BoxBufferGeometry, DoubleSide } from "three";
   import { DEG2RAD } from "three/src/math/MathUtils";
-  import { PositionalAudio, Audio, PositionalAudioHelper, AudioListener } from "@threlte/core";
+  import { PositionalAudio, useAudioListener, Audio, PositionalAudioHelper, AudioListener } from "@threlte/core";
   import { HTML } from "@threlte/extras";
 
   import {
@@ -44,6 +44,7 @@
   let myz = 0;
   let counter = 0;
   let streetLight = true;
+  let music = false;
   onMount(() => {
     setInterval(() => {
       myx = Math.sin(counter) * 40;
@@ -72,10 +73,19 @@
     </div>
   {/if}
   <Canvas size={{ height: window.innerHeight, width: window.innerWidth }}>
-    <Fog color={"#dddddd"} near={25} far={100} />
+    <Fog color={"#444444"} near={25} far={100} />
     <HTML occlude transform distanceFactor={1.17} position={{ x: -19.6, y: 28, z: -8.25 }} rotation={{ y: -Math.PI / 2 }}>
-      <img src="./invis.gif" alt="" />
+      <img
+        src="./invis.gif"
+        alt=""
+        on:click={() => {
+          music = true;
+        }}
+        on:keydown
+      />
     </HTML>
+    <HemisphereLight intensity={0.5} skyColor={0xffbd08} groundColor={0x323973} />
+
     <!-- <Pass pass={new FilmPass(1000, 0, 0, false)} /> -->
     <!-- <PointLight visible position={{ x: 30, y: 3, z: 10 }} color={"#44F1A6"} /> -->
     <PointLight
@@ -87,7 +97,7 @@
       visible
       position={{ x: -3, y: 21, z: 3 }}
       color={"#44F1A6"}
-      intensity={3}
+      intensity={5}
     />
 
     {#if streetLight}
@@ -112,21 +122,24 @@
     <AmbientLight intensity={0.1} />
     <Group scale={$scale}>
       <GLTF castShadow receiveShadow url={"https://decoded-files.fra1.digitaloceanspaces.com/deadly-games/deadly.glb"} scale={3} />
-      <PositionalAudio
-        refDistance={10}
-        volume={1}
-        autoplay
-        loop
-        directionalCone={{
-          coneInnerAngle: 90,
-          coneOuterAngle: 220,
-          coneOuterGain: 0.3,
-        }}
-        source={"/dilla.mp3"}
-        position={{ x: -15, y: 25, z: 25 }}
-      >
-        <!-- <PositionalAudioHelper /> -->
-      </PositionalAudio>
+      {#if music}
+        <PositionalAudio
+          refDistance={10}
+          volume={1}
+          loop
+          autoplay
+          playbackRate="1"
+          directionalCone={{
+            coneInnerAngle: 90,
+            coneOuterAngle: 220,
+            coneOuterGain: 0.3,
+          }}
+          source={"/dilla.mp3"}
+          position={{ x: -15, y: 25, z: 25 }}
+        >
+          <!-- <PositionalAudioHelper /> -->
+        </PositionalAudio>
+      {/if}
     </Group>
   </Canvas>
 </main>
